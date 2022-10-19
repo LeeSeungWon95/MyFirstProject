@@ -2,7 +2,6 @@
 
 
 #include "Floater.h"
-
 // Sets default values
 AFloater::AFloater()
 {
@@ -14,7 +13,9 @@ AFloater::AFloater()
 	InitialLocation = FVector(0.0f);
 	PlacedLocation = FVector(0.0f);
 	WorldOrigin = FVector(0.0f, 0.0f, 0.0f);
-	InitalDirection = FVector(0.0f, 0.0f, 0.0f);
+	InitialDirection = FVector(0.0f, 0.0f, 0.0f);
+	InitialForce = FVector(200000.0f, 0.0f, 0.0f);
+	InitialTorque = FVector(200000.0f, 0.0f, 0.0f);
 
 	bInitializeFloaterLocations = false;
 	bShouldFloat = false;
@@ -32,6 +33,8 @@ void AFloater::BeginPlay()
 		SetActorLocation(InitialLocation);
 	}
 
+	StaticMesh->AddForce(InitialForce);
+	StaticMesh->AddTorqueInRadians(InitialTorque);
 }
 
 // Called every frame
@@ -42,7 +45,9 @@ void AFloater::Tick(float DeltaTime)
 	if (bShouldFloat)
 	{
 		FHitResult HitResult;
-		AddActorLocalOffset(InitalDirection, false, &HitResult);
+		AddActorLocalOffset(InitialDirection, true, &HitResult);
+
+		FVector HitLocation = HitResult.Location;
 	}
 
 }
