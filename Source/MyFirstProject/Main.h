@@ -35,6 +35,8 @@ public:
 	// Sets default values for this character's properties
 	AMain();
 
+	TArray<FVector> PickupLocations;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enums")
 	EMovementStatus MovementStatus;
 
@@ -134,4 +136,7 @@ public:
 	void ShiftKeyUp();
 
 	FORCEINLINE void SetStaminaStatus(EStaminaStatus Status) { StaminaStatus = Status; }
+
+	UFUNCTION(BlueprintCallable)
+	void ShowPickupLocations();
 };
