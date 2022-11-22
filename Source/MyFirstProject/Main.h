@@ -11,6 +11,7 @@ enum class EMovementStatus : uint8
 {
 	EMS_Normal UMETA(DisplayName = "Normal"),
 	EMS_Sprinting UMETA(DisplayName = "Sprinting"),
+	EMS_Dead UMETA(DisplayName = "Dead"),
 
 	EMS_MAX UMETA(DisplayName = "DefaultMAX")
 };
@@ -149,6 +150,9 @@ public:
 	/** Called for side to side input */
 	void MoveRight(float Value);
 
+	bool bMovingForward;
+	bool bMovingRight;
+
 	/** Called via input to turn at a given rate
 	* @param Rate This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	*/
@@ -170,10 +174,18 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(BlueprintCallable)
 	void IncrementCoins(int32 Amount);
+	UFUNCTION(BlueprintCallable)
+	void IncrementHealth(float Amount);
 
 
 	void Die();
+
+	virtual void Jump() override;
+
+	UFUNCTION(BlueprintCallable)
+	void DeathEnd();
 
 	/** Set movement status and running speed */
 	void SetMovementStatus(EMovementStatus Status);
@@ -202,4 +214,9 @@ public:
 	void PlaySwingSound();
 
 	void SetInterpToEnemy(bool Interp);
+
+	void UpdateCombatTarget();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TSubclassOf<AEnemy> EnemyFilter;
 };
