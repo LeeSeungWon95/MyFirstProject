@@ -16,6 +16,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Enemy.h"
 #include "MainPlayerController.h"
+#include "FirstSaveGame.h"
 
 // Sets default values
 AMain::AMain()
@@ -536,6 +537,40 @@ void AMain::SwitchLevel(FName LevelName)
 		{
 			UGameplayStatics::OpenLevel(World, LevelName);
 		}
+	}
+}
+
+void AMain::SaveGame()
+{
+	UFirstSaveGame* SaveGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::CreateSaveGameObject(UFirstSaveGame::StaticClass()));
+	SaveGameInstance->CharacterStat.Health = Health;
+	SaveGameInstance->CharacterStat.MaxHealth = MaxHealth;
+	SaveGameInstance->CharacterStat.Stamina = Stamina;
+	SaveGameInstance->CharacterStat.MaxStamina = MaxStamina;
+	SaveGameInstance->CharacterStat.Coins = Coins;
+
+	SaveGameInstance->CharacterStat.Location = GetActorLocation();
+	SaveGameInstance->CharacterStat.Rotation = GetActorRotation();
+
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->PlayerName, SaveGameInstance->UserIndex);
+}
+
+void AMain::LoadGame(bool SetPosition)
+{
+	UFirstSaveGame* LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::CreateSaveGameObject(UFirstSaveGame::StaticClass()));
+
+	LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->PlayerName, LoadGameInstance->UserIndex));
+
+	Health = LoadGameInstance->CharacterStat.Health;
+	MaxHealth = LoadGameInstance->CharacterStat.MaxHealth;
+	Stamina = LoadGameInstance->CharacterStat.Stamina;
+	MaxStamina = LoadGameInstance->CharacterStat.MaxStamina;
+	Coins = LoadGameInstance->CharacterStat.Coins;
+
+	if (SetPosition)
+	{
+		SetActorLocation(LoadGameInstance->CharacterStat.Location);
+		SetActorRotation(LoadGameInstance->CharacterStat.Rotation);
 	}
 }
 
