@@ -51,7 +51,11 @@ public:
 	void DisplayEnemyHealthBar();
 	void RemoveEnemyHealthBar();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "HUD")
 	void DisplayPauseMenu();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "HUD")
 	void RemovePauseMenu();
+
 	void TogglePauseMenu();
 };
