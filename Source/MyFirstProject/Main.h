@@ -36,6 +36,9 @@ public:
 	// Sets default values for this character's properties
 	AMain();
 
+	UPROPERTY(EditDefaultsOnly, Category = "SavedData")
+	TSubclassOf<class AItemStorage> WeaponStorage;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bHasCombatTarget;
 
@@ -166,6 +169,10 @@ public:
 	bool bLMBDown;
 	void LMBDown();
 	void LMBUp();
+
+	bool bESCDown;
+	void ESCDown();
+	void ESCUp();
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }

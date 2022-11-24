@@ -7,4 +7,6 @@ UFirstSaveGame::UFirstSaveGame()
 {
 	PlayerName = TEXT("Default");
 	UserIndex = 0;
+
+	CharacterStat.WeaponName = TEXT("");
 }
