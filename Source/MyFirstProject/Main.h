@@ -156,6 +156,14 @@ public:
 	bool bMovingForward;
 	bool bMovingRight;
 
+	/** Called for Yaw rotation */
+	void Turn(float Value);
+
+	/** Called for Pitch rotation */
+	void LookUp(float Value);
+
+	bool CanMove(float Value);
+
 	/** Called via input to turn at a given rate
 	* @param Rate This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	*/
