@@ -91,6 +91,19 @@ void AMain::BeginPlay()
 	Super::BeginPlay();
 	
 	MainPlayerController = Cast<AMainPlayerController>(GetController());
+
+	FString Map = GetWorld()->GetMapName();
+	Map.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+
+	if (Map != "SunTemple")
+	{
+		LoadGameNoSwitch();
+
+		if (MainPlayerController)
+		{
+			MainPlayerController->GameModeOnly();
+		}
+	}
 }
 
 // Called every frame
@@ -589,6 +602,7 @@ void AMain::SwitchLevel(FName LevelName)
 
 		if (CurrentLevelName != LevelName)
 		{
+			SaveGame();
 			UGameplayStatics::OpenLevel(World, LevelName);
 		}
 	}
@@ -602,6 +616,10 @@ void AMain::SaveGame()
 	SaveGameInstance->CharacterStat.Stamina = Stamina;
 	SaveGameInstance->CharacterStat.MaxStamina = MaxStamina;
 	SaveGameInstance->CharacterStat.Coins = Coins;
+
+	FString MapName = GetWorld()->GetMapName();
+	MapName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+	SaveGameInstance->CharacterStat.LevelName = MapName;
 
 	if (EquippedWeapon)
 	{
@@ -647,5 +665,49 @@ void AMain::LoadGame(bool SetPosition)
 		SetActorLocation(LoadGameInstance->CharacterStat.Location);
 		SetActorRotation(LoadGameInstance->CharacterStat.Rotation);
 	}
+
+	SetMovementStatus(EMovementStatus::EMS_Normal);
+	GetMesh()->bPauseAnims = false;
+	GetMesh()->bNoSkeletonUpdate = false;
+
+	if (LoadGameInstance->CharacterStat.LevelName != TEXT(""))
+	{
+		FName LevelName(*LoadGameInstance->CharacterStat.LevelName);
+
+		SwitchLevel(LevelName);
+	}
+}
+
+void AMain::LoadGameNoSwitch()
+{
+	UFirstSaveGame* LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::CreateSaveGameObject(UFirstSaveGame::StaticClass()));
+
+	LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->PlayerName, LoadGameInstance->UserIndex));
+
+	Health = LoadGameInstance->CharacterStat.Health;
+	MaxHealth = LoadGameInstance->CharacterStat.MaxHealth;
+	Stamina = LoadGameInstance->CharacterStat.Stamina;
+	MaxStamina = LoadGameInstance->CharacterStat.MaxStamina;
+	Coins = LoadGameInstance->CharacterStat.Coins;
+
+	if (WeaponStorage)
+	{
+		AItemStorage* Weapons = GetWorld()->SpawnActor<AItemStorage>(WeaponStorage);
+		if (Weapons)
+		{
+			FString WeaponName = LoadGameInstance->CharacterStat.WeaponName;
+
+			if (Weapons->WeaponMap.Contains(WeaponName))
+			{
+				AWeapon* WeaponToEquip = GetWorld()->SpawnActor<AWeapon>(Weapons->WeaponMap[WeaponName]);
+				WeaponToEquip->Equip(this);
+			}
+
+		}
+	}
+
+	SetMovementStatus(EMovementStatus::EMS_Normal);
+	GetMesh()->bPauseAnims = false;
+	GetMesh()->bNoSkeletonUpdate = false;
 }
 

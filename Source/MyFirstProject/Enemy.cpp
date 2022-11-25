@@ -259,6 +259,10 @@ void AEnemy::DeactivateCollision()
 
 void AEnemy::Attack()
 {
+	if (CombatTarget)
+	{
+		if (CombatTarget->MovementStatus == EMovementStatus::EMS_Dead) return;
+	}
 	if (Alive() && bHasValidTarget)
 	{
 		if (AIController)
